@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
@@ -20,10 +21,10 @@ import java.util.stream.Collectors;
  * @author nikoh
  */
 public class Kalapacsvetes {
-    public static void main(String[] args) {
+   public static void main(String[] args) {
         List<sportolo> sportolok = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("kalapacsvetés.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\nikoh\\Documents\\GitHub\\meres-2025-01\\kalapacsvetes.txt"))) {
           
             br.readLine();
             
@@ -32,11 +33,9 @@ public class Kalapacsvetes {
                 sportolok.add(new sportolo(line));
             }
 
-            // 4. 
-            long dobasok80Felett = sportolok.stream()
-                .filter(s -> s.getEredmeny() >= 80.0)
-                .count();
-            System.out.println("80 méter feletti dobások száma: " + dobasok80Felett);
+            // 4.
+            long dobasokSzama = sportolok.size();
+            System.out.println("4. feladat: " + dobasokSzama + " dobás eredménye található.");
 
             // 5. 
             OptionalDouble magyarAtlag = sportolok.stream()
@@ -44,30 +43,31 @@ public class Kalapacsvetes {
                 .mapToDouble(sportolo::getEredmeny)
                 .average();
             
-            if (magyarAtlag.isPresent()) {
-                System.out.printf("Magyar sportolók átlageredménye: %.2f m%n", magyarAtlag.getAsDouble());
-            } else {
-                System.out.println("Nincs magyar sportoló az adatok között.");
-            }
+            System.out.println("5. feladat: A magyar sportolók átlagosan " + 
+                String.format("%.2f", magyarAtlag.orElse(0)) + " métert dobtak.");
 
             // 6. 
-            System.out.println("\nÉvenkénti legjobb eredmények:");
-            sportolok.stream()
-                .collect(Collectors.groupingBy(s -> s.getDatum().substring(0, 4)))
-                .forEach((ev, lista) -> {
-                    double maxEredmeny = lista.stream()
-                        .mapToDouble(sportolo::getEredmeny)
-                        .max()
-                        .orElse(0.0);
-                    System.out.printf("%s: %.2f m%n", ev, maxEredmeny);
-                });
+            System.out.println("6. feladat: Adjon meg egy évszámot:");
+            Scanner sc = new Scanner(System.in);
+            String ev = sc.nextLine();
+            
+            List<sportolo> eviDobasok = sportolok.stream()
+                .filter(s -> s.getDatum().startsWith(ev))
+                .collect(Collectors.toList());
+
+            if (eviDobasok.isEmpty()) {
+                System.out.println("Egy dobás sem került be ebben az évben.");
+            } else {
+                System.out.println(eviDobasok.size() + " darab dobás került be ebben az évben.");
+                eviDobasok.forEach(s -> System.out.println(s.getNev()));
+            }
 
             // 7. 
-            System.out.println("\nOrszágonkénti statisztika:");
+            System.out.println("7. feladat: Statisztika");
             Map<String, Long> orszagStatisztika = sportolok.stream()
                 .collect(Collectors.groupingBy(sportolo::getOrszagKod, Collectors.counting()));
             orszagStatisztika.forEach((orszag, db) -> 
-                System.out.printf("%s: %d dobás%n", orszag, db));
+                System.out.printf("%s - %d dobás%n", orszag, db));
 
             // 8. 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("magyarok.txt"))) {

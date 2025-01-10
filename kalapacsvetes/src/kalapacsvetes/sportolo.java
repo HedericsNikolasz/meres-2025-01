@@ -19,7 +19,7 @@ public class sportolo {
     public sportolo(String sor) {
         String[] adatok = sor.split(";");
         this.helyezes = adatok[0];
-        this.eredmeny = Double.parseDouble(adatok[1]);
+        this.eredmeny = Double.parseDouble(adatok[1].replace(",", "."));
         this.nev = adatok[2];
         this.orszagKod = adatok[3];
         this.helyszin = adatok[4];
@@ -36,6 +36,10 @@ public class sportolo {
 
     public String getDatum() {
         return datum;
+    }
+
+    public String getNev() {
+        return nev;
     }
 
     public String toFileString() {
